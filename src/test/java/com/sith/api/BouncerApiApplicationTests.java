@@ -1,4 +1,4 @@
-package com.sith.bouncer_api;
+package com.sith.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
