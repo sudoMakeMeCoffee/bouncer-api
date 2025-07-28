@@ -1,6 +1,6 @@
 package com.sith.api.config;
 
-import com.sith.api.service.impl.ClientDetailsService;
+import com.sith.api.service.ClientDetailsService;
 import com.sith.api.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

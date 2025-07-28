@@ -1,4 +1,4 @@
-package com.sith.api.service.impl;
+package com.sith.api.service;
 
 import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientPrincipal;

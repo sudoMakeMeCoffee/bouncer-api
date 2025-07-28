@@ -8,6 +8,7 @@ import com.sith.api.dto.response.LoginResult;
 import com.sith.api.entity.Client;
 import com.sith.api.repository.ClientRepository;
 import com.sith.api.service.ClientAuthService;
+import com.sith.api.service.ClientDetailsService;
 import com.sith.api.utils.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
