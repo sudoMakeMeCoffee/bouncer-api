@@ -1,11 +1,15 @@
 package com.sith.api.controller;
 
+import com.sith.api.dto.request.LoginRequestDto;
 import com.sith.api.dto.request.SignUpRequestDto;
 import com.sith.api.dto.response.ApiResponse;
 import com.sith.api.dto.response.ClientResponseDto;
+import com.sith.api.dto.response.LoginResult;
 import com.sith.api.service.ClientAuthService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -36,5 +40,30 @@ public class ClientAuthController {
         );
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<ClientResponseDto>> login(@Valid @RequestBody LoginRequestDto requestDto){
+        LoginResult loginResult = clientAuthService.login(requestDto);
+
+        ApiResponse<ClientResponseDto> response = new ApiResponse<>(
+                true,
+                "Login Successfull.",
+                loginResult.getClientResponseDto(),
+                null
+        );
+
+        ResponseCookie cookie =ResponseCookie.from("jwt", loginResult.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 }
