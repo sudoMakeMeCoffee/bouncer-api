@@ -30,16 +30,26 @@ public class ClientAuthController {
     public ResponseEntity<ApiResponse<ClientResponseDto>> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
         requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
 
-        ClientResponseDto savedClient = clientAuthService.signUp(requestDto);
+        LoginResult loginResult = clientAuthService.signUp(requestDto);
 
         ApiResponse<ClientResponseDto> response = new ApiResponse<>(
                 true,
                 "Client created successfully",
-                savedClient,
+                loginResult.getClientResponseDto(),
                 null
         );
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        ResponseCookie cookie =ResponseCookie.from("jwt", loginResult.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 
 

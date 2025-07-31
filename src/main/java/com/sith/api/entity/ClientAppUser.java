@@ -1,8 +1,9 @@
 package com.sith.api.entity;
 
-import com.sith.api.enums.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,26 +13,21 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class Client{
-
+public class ClientAppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String username;
+    @ManyToOne
+    @JoinColumn(name = "client_app_id", nullable = false)
+    private ClientApp clientApp;
 
-    @Column(unique = true)
     private String email;
 
     private String password;
 
     private boolean emailVerified;
-
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
 
     @UpdateTimestamp
     @Column(nullable = false, updatable = true)
@@ -40,6 +36,4 @@ public class Client{
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-
 }

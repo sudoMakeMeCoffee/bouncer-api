@@ -6,6 +6,6 @@ import com.sith.api.dto.response.ClientResponseDto;
 import com.sith.api.dto.response.LoginResult;
 
 public interface ClientAuthService {
-    public ClientResponseDto signUp(SignUpRequestDto requestDto);
+    public LoginResult signUp(SignUpRequestDto requestDto);
     public LoginResult login(LoginRequestDto requestDto);
 }

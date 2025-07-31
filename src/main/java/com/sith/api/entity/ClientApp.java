@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,10 +26,14 @@ public class ClientApp {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
+    @Column(unique = true)
     private String name;
 
     @Column(nullable = false, unique = true)
     private String apiKey;
+
+    @OneToMany(mappedBy = "clientApp", cascade = CascadeType.ALL)
+    private List<ClientAppUser> users;
 
     @UpdateTimestamp
     @Column(nullable = false, updatable = true)

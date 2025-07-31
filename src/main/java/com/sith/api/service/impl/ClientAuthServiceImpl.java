@@ -31,22 +31,29 @@ public class ClientAuthServiceImpl implements ClientAuthService {
     }
 
     @Override
-    public ClientResponseDto signUp(SignUpRequestDto requestDto) {
-        Client client = Client.builder()
+    public LoginResult signUp(SignUpRequestDto requestDto) {
+        Client newClient = Client.builder()
                 .username(requestDto.getUsername())
                 .email(requestDto.getEmail())
                 .password(requestDto.getPassword())
                 .role(requestDto.getRole())
                 .build();
-        Client savedClient = clientRepository.save(client);
+        Client savedClient = clientRepository.save(newClient);
 
-        return ClientResponseDto.fromEntity(savedClient);
+        UserDetails userDetails = clientDetailsService.loadUserByUsername(requestDto.getEmail());
+        String jwt = jwtUtil.generateToken(userDetails);
+
+        return LoginResult.builder()
+                .token(jwt)
+                .clientResponseDto(ClientResponseDto.fromEntity(newClient))
+                .build();
     }
 
     @Override
     public LoginResult login(LoginRequestDto requestDto) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword()));
+                new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
+        );
 
         UserDetails userDetails = clientDetailsService.loadUserByUsername(requestDto.getEmail());
         Client client = clientRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Client not found."));
