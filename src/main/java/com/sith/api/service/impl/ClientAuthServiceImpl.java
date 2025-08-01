@@ -5,10 +5,12 @@ import com.sith.api.dto.request.LoginRequestDto;
 import com.sith.api.dto.request.SignUpRequestDto;
 import com.sith.api.dto.response.ClientResponseDto;
 import com.sith.api.dto.response.LoginResult;
+import com.sith.api.dto.response.RefreshTokenResponseDto;
 import com.sith.api.entity.Client;
 import com.sith.api.repository.ClientRepository;
 import com.sith.api.service.ClientAuthService;
 import com.sith.api.service.ClientDetailsService;
+import com.sith.api.service.RefreshTokenService;
 import com.sith.api.utils.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,12 +23,14 @@ public class ClientAuthServiceImpl implements ClientAuthService {
     private final ClientRepository clientRepository;
     private final AuthenticationManager authenticationManager;
     private final ClientDetailsService clientDetailsService;
+    private final RefreshTokenService refreshTokenService;
     private final JwtUtil jwtUtil;
 
-    public ClientAuthServiceImpl(ClientRepository clientRepository, AuthenticationManager authenticationManager, ClientDetailsService clientDetailsService, JwtUtil jwtUtil) {
+    public ClientAuthServiceImpl(ClientRepository clientRepository, AuthenticationManager authenticationManager, ClientDetailsService clientDetailsService, RefreshTokenService refreshTokenService, JwtUtil jwtUtil) {
         this.clientRepository = clientRepository;
         this.authenticationManager = authenticationManager;
         this.clientDetailsService = clientDetailsService;
+        this.refreshTokenService = refreshTokenService;
         this.jwtUtil = jwtUtil;
     }
 
@@ -41,10 +45,13 @@ public class ClientAuthServiceImpl implements ClientAuthService {
         Client savedClient = clientRepository.save(newClient);
 
         UserDetails userDetails = clientDetailsService.loadUserByUsername(requestDto.getEmail());
-        String jwt = jwtUtil.generateToken(userDetails);
+        String accessToken = jwtUtil.generateToken(userDetails);
+        RefreshTokenResponseDto refreshTokenResponseDto = refreshTokenService.createRefreshToken(savedClient.getId());
+
 
         return LoginResult.builder()
-                .token(jwt)
+                .accessToken(accessToken)
+                .refreshToken(refreshTokenResponseDto.getToken())
                 .clientResponseDto(ClientResponseDto.fromEntity(newClient))
                 .build();
     }
@@ -57,10 +64,10 @@ public class ClientAuthServiceImpl implements ClientAuthService {
 
         UserDetails userDetails = clientDetailsService.loadUserByUsername(requestDto.getEmail());
         Client client = clientRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Client not found."));
-        String jwt = jwtUtil.generateToken(userDetails);
+        String accessToken = jwtUtil.generateToken(userDetails);
 
         return LoginResult.builder()
-                .token(jwt)
+                .accessToken(accessToken)
                 .clientResponseDto(ClientResponseDto.fromEntity(client))
                 .build();
 
