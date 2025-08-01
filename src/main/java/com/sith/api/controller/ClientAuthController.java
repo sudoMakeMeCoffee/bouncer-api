@@ -68,27 +68,43 @@ public class ClientAuthController {
 
         ApiResponse<ClientResponseDto> response = new ApiResponse<>(
                 true,
-                "Login Successfull.",
+                "Login Successful.",
                 loginResult.getClientResponseDto(),
                 null
         );
 
-        ResponseCookie cookie =ResponseCookie.from("access_token", loginResult.getAccessToken())
+        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", loginResult.getAccessToken())
                 .httpOnly(true)
-                .secure(false)
+                .secure(false) // change to true in production
                 .path("/")
-                .maxAge(24 * 60 * 60)
+                .maxAge(15 * 60) // 15 minutes for access token
+                .sameSite("Lax")
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", loginResult.getRefreshToken())
+                .httpOnly(true)
+                .secure(false) // change to true in production
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60) // 7 days for refresh token
                 .sameSite("Lax")
                 .build();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString()) // <-- add second cookie
                 .body(response);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
-        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
@@ -104,7 +120,8 @@ public class ClientAuthController {
         );
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, String.valueOf(cookie))
+                .header(HttpHeaders.SET_COOKIE, String.valueOf(accessTokenCookie))
+                .header(HttpHeaders.SET_COOKIE, String.valueOf(refreshTokenCookie))
                 .body(response);
     }
 

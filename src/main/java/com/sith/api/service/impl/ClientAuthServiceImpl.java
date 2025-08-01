@@ -65,9 +65,12 @@ public class ClientAuthServiceImpl implements ClientAuthService {
         UserDetails userDetails = clientDetailsService.loadUserByUsername(requestDto.getEmail());
         Client client = clientRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Client not found."));
         String accessToken = jwtUtil.generateToken(userDetails);
+        RefreshTokenResponseDto refreshTokenResponseDto = refreshTokenService.createRefreshToken(client.getId());
+
 
         return LoginResult.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshTokenResponseDto.getToken())
                 .clientResponseDto(ClientResponseDto.fromEntity(client))
                 .build();
 
