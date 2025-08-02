@@ -12,7 +12,6 @@ import com.sith.api.repository.ClientRepository;
 import com.sith.api.service.*;
 import com.sith.api.utils.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -107,11 +106,6 @@ public class ClientAuthServiceImpl implements ClientAuthService {
 
         emailService.sendEmail(to, subject, verificationLink);
     }
-
-
-
-
-
 
     // Helper Methods
 
