@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface VerificationTokenService {
     public VerificationToken createVerificationToken(VerificationToken verificationToken);
     public Optional<VerificationToken> findByToken(String verificationToken);
-
+    public void delete(VerificationToken verificationToken);
 }
 

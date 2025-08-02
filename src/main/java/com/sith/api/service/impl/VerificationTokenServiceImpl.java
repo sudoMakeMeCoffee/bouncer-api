@@ -25,4 +25,9 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     public Optional<VerificationToken> findByToken(String verificationToken) {
         return verificationTokenRepository.findByToken(verificationToken);
     }
+
+    @Override
+    public void delete(VerificationToken verificationToken) {
+        verificationTokenRepository.delete(verificationToken);
+    }
 }

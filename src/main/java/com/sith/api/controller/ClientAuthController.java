@@ -73,7 +73,6 @@ public class ClientAuthController {
                 .body(response);
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<ClientResponseDto>> login(@Valid @RequestBody LoginRequestDto requestDto){
         LoginResult loginResult = clientAuthService.login(requestDto);
@@ -169,6 +168,8 @@ public class ClientAuthController {
         }
 
         clientService.verification(verificationToken.getClient().getId());
+
+        verificationTokenService.delete(verificationToken);
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(baseUrl + "?expired=false&valid=true"))
