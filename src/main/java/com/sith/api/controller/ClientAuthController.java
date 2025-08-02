@@ -5,16 +5,19 @@ import com.sith.api.dto.request.SignUpRequestDto;
 import com.sith.api.dto.response.ApiResponse;
 import com.sith.api.dto.response.ClientResponseDto;
 import com.sith.api.dto.response.LoginResult;
+import com.sith.api.entity.Client;
 import com.sith.api.entity.VerificationToken;
 import com.sith.api.enums.VerificationType;
-import com.sith.api.service.ClientAuthService;
-import com.sith.api.service.ClientService;
-import com.sith.api.service.VerificationTokenService;
+import com.sith.api.exception.UnauthorizedException;
+import com.sith.api.service.*;
+import com.sith.api.utils.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,12 +33,18 @@ public class ClientAuthController {
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenService verificationTokenService;
     private final ClientService clientService;
+    private final ClientDetailsService clientDetailsService;
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
 
-    public ClientAuthController(ClientAuthService clientAuthService, PasswordEncoder passwordEncoder, VerificationTokenService verificationTokenService, ClientService clientService) {
+    public ClientAuthController(ClientAuthService clientAuthService, PasswordEncoder passwordEncoder, VerificationTokenService verificationTokenService, ClientService clientService, ClientDetailsService clientDetailsService, JwtUtil jwtUtil, RefreshTokenService refreshTokenService) {
         this.clientAuthService = clientAuthService;
         this.passwordEncoder = passwordEncoder;
         this.verificationTokenService = verificationTokenService;
         this.clientService = clientService;
+        this.clientDetailsService = clientDetailsService;
+        this.jwtUtil = jwtUtil;
+        this.refreshTokenService = refreshTokenService;
     }
 
 
@@ -163,14 +172,36 @@ public class ClientAuthController {
         }
 
         clientService.verification(verificationToken.getClient().getId());
-
         verificationTokenService.delete(verificationToken);
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(baseUrl + "?expired=false&valid=true"))
+
+        Client client = verificationToken.getClient();
+        UserDetails userDetails = clientDetailsService.loadUserByUsername(client.getEmail());
+        String accessToken = jwtUtil.generateToken(userDetails);
+        String refreshToken = refreshTokenService.createRefreshToken(client.getId()).getToken();
+
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(true) // set to true in production
+                .path("/")
+                .maxAge(15 * 60) // 15 minutes
+                .sameSite("Lax")
                 .build();
 
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60) // 7 days
+                .sameSite("Lax")
+                .build();
 
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .location(URI.create(baseUrl + "?expired=false&valid=true"))
+                .build();
     }
 
     @PostMapping("/send-verification-email")

@@ -100,10 +100,10 @@ public class ClientAuthServiceImpl implements ClientAuthService {
 
         VerificationToken token = createVerificationToken(client);
 
-        String frontendBaseUrl = "http://localhost:3000";
+        String baseUrl = "http://localhost:8080";
         String verificationLink = String.format(
                 "%s/api/v1/auth/client/verification?token=%s&type=email",
-                frontendBaseUrl,
+                baseUrl,
                 token.getToken()
         );
 
