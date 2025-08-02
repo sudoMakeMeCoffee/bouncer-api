@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
     @GetMapping
     public String hello(){
-        return "hello homes";
+        return "Bouncer Api";
+    }
+
+    @GetMapping("/docs")
+    public String docs(){
+        return "Docs";
     }
 }
