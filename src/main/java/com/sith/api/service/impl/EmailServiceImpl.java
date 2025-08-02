@@ -20,19 +20,18 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendEmail(String to, String subject, String code) {
+    public void sendEmail(String to, String subject, String verificationLink) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setFrom("no-reply@hackathonhub.com");
+            helper.setFrom("no-reply@bouncer.com");
 
             Context context = new Context();
-            context.setVariable("code", code);
-
-            String htmlContent = templateEngine.process("signup", context);
+            context.setVariable("verificationLink", verificationLink);
+            String htmlContent = templateEngine.process("verifyEmail", context);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);

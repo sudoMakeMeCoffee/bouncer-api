@@ -5,7 +5,11 @@ import com.sith.api.dto.request.SignUpRequestDto;
 import com.sith.api.dto.response.ApiResponse;
 import com.sith.api.dto.response.ClientResponseDto;
 import com.sith.api.dto.response.LoginResult;
+import com.sith.api.entity.VerificationToken;
+import com.sith.api.enums.VerificationType;
 import com.sith.api.service.ClientAuthService;
+import com.sith.api.service.ClientService;
+import com.sith.api.service.VerificationTokenService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,16 +18,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1/auth/client")
 public class ClientAuthController {
 
     private final ClientAuthService clientAuthService;
     private final PasswordEncoder passwordEncoder;
+    private final VerificationTokenService verificationTokenService;
+    private final ClientService clientService;
 
-    public ClientAuthController(ClientAuthService clientAuthService, PasswordEncoder passwordEncoder) {
+    public ClientAuthController(ClientAuthService clientAuthService, PasswordEncoder passwordEncoder, VerificationTokenService verificationTokenService, ClientService clientService) {
         this.clientAuthService = clientAuthService;
         this.passwordEncoder = passwordEncoder;
+        this.verificationTokenService = verificationTokenService;
+        this.clientService = clientService;
     }
 
     @PostMapping("/signup")
@@ -123,6 +135,46 @@ public class ClientAuthController {
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(accessTokenCookie))
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(refreshTokenCookie))
                 .body(response);
+    }
+
+    @GetMapping("/verification")
+    public ResponseEntity<Void> verification(@RequestParam("token") String token, @RequestParam("type") String type ){
+        Optional<VerificationToken> optionalVerificationToken = verificationTokenService.findByToken(token);
+
+        String baseUrl = null;
+
+        if (VerificationType.EMAIL.name().equalsIgnoreCase(type)){
+            baseUrl = "http://localhost:3000/verification/email";
+        } else if (VerificationType.PASSWORD.name().equalsIgnoreCase(type)) {
+            baseUrl = "http://localhost:3000/verification/password";
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create("http://localhost:3000/verification"))
+                    .build();
+        }
+
+        if(optionalVerificationToken.isEmpty()){
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(baseUrl + "?expired=false&valid=false"))
+                    .build();
+        }
+
+        VerificationToken verificationToken = optionalVerificationToken.get();
+
+        if (verificationToken.getExpiredAt().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(baseUrl + "?expired=true&valid=true"))
+                    .build();
+        }
+
+        clientService.verification(verificationToken.getClient().getId());
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(baseUrl + "?expired=false&valid=true"))
+                .build();
+
+
     }
 
 }
