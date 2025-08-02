@@ -19,7 +19,12 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ApiResponse<Object>> TooManyRequestsExceptionHandler(TooManyRequestsException ex){
+        ApiResponse<Object> response = new ApiResponse<>(false, null, null, ex.getMessage());
 
+        return new ResponseEntity<ApiResponse<Object>>(response, HttpStatus.TOO_MANY_REQUESTS);
+    }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiResponse<Object>> MethodArgumentTypeMismatchExceptionHandler(MethodArgumentTypeMismatchException ex){
