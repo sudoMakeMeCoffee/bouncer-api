@@ -6,6 +6,7 @@ import com.sith.api.dto.response.ClientResponseDto;
 import com.sith.api.dto.response.LoginResult;
 
 public interface ClientAuthService {
-    public LoginResult signUp(SignUpRequestDto requestDto);
+    public ClientResponseDto signUp(SignUpRequestDto requestDto);
     public LoginResult login(LoginRequestDto requestDto);
+    public void sendVerificationLink(String to, String subject);
 }

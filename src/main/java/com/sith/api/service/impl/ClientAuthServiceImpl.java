@@ -12,6 +12,7 @@ import com.sith.api.enums.VerificationType;
 import com.sith.api.repository.ClientRepository;
 import com.sith.api.service.*;
 import com.sith.api.utils.JwtUtil;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,7 +43,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
     }
 
     @Override
-    public LoginResult signUp(SignUpRequestDto requestDto) {
+    public ClientResponseDto signUp(SignUpRequestDto requestDto) {
         Client newClient = Client.builder()
                 .username(requestDto.getUsername())
                 .email(requestDto.getEmail())
@@ -55,24 +56,9 @@ public class ClientAuthServiceImpl implements ClientAuthService {
         String accessToken = jwtUtil.generateToken(userDetails);
         RefreshTokenResponseDto refreshTokenResponseDto = refreshTokenService.createRefreshToken(savedClient.getId());
 
-        if(!savedClient.isEmailVerified()){
-            VerificationToken verificationToken = VerificationToken.builder()
-                    .client(savedClient)
-                    .token(UUID.randomUUID().toString())
-                    .type(VerificationType.EMAIL)
-                    .expiredAt(LocalDateTime.now().plusMinutes(15))
-                    .build();
+        sendVerificationLink(savedClient.getEmail(), "Verify your email.");
 
-            VerificationToken createdVerificationToken = verificationTokenService.createVerificationToken(verificationToken);
-
-            emailService.sendEmail(savedClient.getEmail(), "Verify your email.", String.format("http://localhost:8080/api/v1/auth/client/verification?token=%s&type=email", verificationToken.getToken()));
-        }
-
-        return LoginResult.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshTokenResponseDto.getToken())
-                .clientResponseDto(ClientResponseDto.fromEntity(newClient))
-                .build();
+        return ClientResponseDto.fromEntity(savedClient);
     }
 
     @Override
@@ -93,5 +79,21 @@ public class ClientAuthServiceImpl implements ClientAuthService {
                 .clientResponseDto(ClientResponseDto.fromEntity(client))
                 .build();
 
+    }
+
+    @Override
+    public void sendVerificationLink(String to, String subject){
+        Client client = clientRepository.findByEmail(to).orElseThrow(() -> new EntityNotFoundException("Email not found"));
+
+        VerificationToken verificationToken = VerificationToken.builder()
+                .client(client)
+                .token(UUID.randomUUID().toString())
+                .type(VerificationType.EMAIL)
+                .expiredAt(LocalDateTime.now().plusMinutes(15))
+                .build();
+
+        VerificationToken createdVerificationToken = verificationTokenService.createVerificationToken(verificationToken);
+
+        emailService.sendEmail(to, subject, String.format("http://localhost:8080/api/v1/auth/client/verification?token=%s&type=email", verificationToken.getToken()));
     }
 }

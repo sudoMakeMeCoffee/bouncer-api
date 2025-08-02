@@ -42,35 +42,16 @@ public class ClientAuthController {
     public ResponseEntity<ApiResponse<ClientResponseDto>> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
         requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
 
-        LoginResult loginResult = clientAuthService.signUp(requestDto);
+        ClientResponseDto clientResponseDto = clientAuthService.signUp(requestDto);
 
         ApiResponse<ClientResponseDto> response = new ApiResponse<>(
                 true,
                 "Client created successfully",
-                loginResult.getClientResponseDto(),
+                clientResponseDto,
                 null
         );
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", loginResult.getAccessToken())
-                .httpOnly(true)
-                .secure(false) // change to true in production
-                .path("/")
-                .maxAge(15 * 60) // 15 minutes for access token
-                .sameSite("Lax")
-                .build();
-
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", loginResult.getRefreshToken())
-                .httpOnly(true)
-                .secure(false) // change to true in production
-                .path("/")
-                .maxAge(7 * 24 * 60 * 60) // 7 days for refresh token
-                .sameSite("Lax")
-                .build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString()) // <-- add second cookie
-                .body(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -178,4 +159,17 @@ public class ClientAuthController {
 
     }
 
+    @PostMapping("/send-verification-email")
+    public ResponseEntity<Object> verification(@RequestParam("email") String email){
+        clientAuthService.sendVerificationLink(email, "Verify your email");
+        ApiResponse<Object> response = new ApiResponse<>(
+                true,
+                "Email sent successfully",
+                null,
+                null
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+    }
 }
