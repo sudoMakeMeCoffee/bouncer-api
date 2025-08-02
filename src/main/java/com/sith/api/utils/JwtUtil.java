@@ -16,6 +16,10 @@ public class JwtUtil {
 
     private final String secret = "astringsecretatleastbitslonghsdjsjdsdjsbdjbscbsjscsc";
 
+    public String extractEmail(String token) {
+        return extractClaims(token).getSubject();
+    }
+
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
     }

@@ -38,6 +38,20 @@ public class ClientAuthController {
         this.clientService = clientService;
     }
 
+
+    @PostMapping("/check-auth")
+    public ResponseEntity<ApiResponse<Object>> checkAuth(HttpServletRequest request) {
+        try {
+            ClientResponseDto user = clientAuthService.checkAuth(request);
+
+            return ResponseEntity.ok(
+                    new ApiResponse<>(true, "Authorized", user, null));
+        } catch (UnauthorizedException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>(false, null, null, ex.getMessage()));
+        }
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<ClientResponseDto>> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
         requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));

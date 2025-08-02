@@ -6,12 +6,15 @@ import com.sith.api.dto.response.ClientResponseDto;
 import com.sith.api.dto.response.LoginResult;
 import com.sith.api.dto.response.RefreshTokenResponseDto;
 import com.sith.api.entity.Client;
+import com.sith.api.entity.ClientPrincipal;
 import com.sith.api.entity.VerificationToken;
 import com.sith.api.enums.VerificationType;
+import com.sith.api.exception.UnauthorizedException;
 import com.sith.api.repository.ClientRepository;
 import com.sith.api.service.*;
 import com.sith.api.utils.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -106,6 +109,21 @@ public class ClientAuthServiceImpl implements ClientAuthService {
 
         emailService.sendEmail(to, subject, verificationLink);
     }
+
+    @Override
+    public ClientResponseDto checkAuth(HttpServletRequest request) {
+        String jwt = jwtUtil.extractJwtFromCookie(request);
+        String email = jwtUtil.extractEmail(jwt);
+
+        Client client = clientRepository.findByEmail(email).orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        if (jwt == null || !jwtUtil.validateToken(jwt, new ClientPrincipal(client))){
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        return ClientResponseDto.fromEntity(client);
+    }
+
 
     // Helper Methods
 
