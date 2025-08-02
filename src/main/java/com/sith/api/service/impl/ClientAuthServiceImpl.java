@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -84,6 +85,8 @@ public class ClientAuthServiceImpl implements ClientAuthService {
     @Override
     public void sendVerificationLink(String to, String subject){
         Client client = clientRepository.findByEmail(to).orElseThrow(() -> new EntityNotFoundException("Email not found"));
+        List<VerificationToken> verificationTokens = verificationTokenService.findAllByClient(client);
+        verificationTokens.forEach(verificationTokenService::delete);
 
         VerificationToken verificationToken = VerificationToken.builder()
                 .client(client)
