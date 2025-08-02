@@ -48,7 +48,7 @@ public class JwtUtil {
         if (request.getCookies() == null) return null;
 
         for (Cookie cookie : request.getCookies()) {
-            if ("jwt".equals(cookie.getName())) {
+            if ("access_token".equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }
