@@ -4,12 +4,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @Builder
-public class LoginResult {
+public class AuthResult {
     private String accessToken;
     private String refreshToken;
     private ClientResponseDto clientResponseDto;

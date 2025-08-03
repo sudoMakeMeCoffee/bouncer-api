@@ -4,13 +4,14 @@ import com.sith.api.dto.request.LoginRequestDto;
 import com.sith.api.dto.request.SignUpRequestDto;
 import com.sith.api.dto.response.ApiResponse;
 import com.sith.api.dto.response.ClientResponseDto;
-import com.sith.api.dto.response.LoginResult;
+import com.sith.api.dto.response.AuthResult;
 import com.sith.api.entity.Client;
 import com.sith.api.entity.VerificationToken;
 import com.sith.api.enums.VerificationType;
 import com.sith.api.exception.UnauthorizedException;
 import com.sith.api.service.*;
 import com.sith.api.utils.JwtUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -48,6 +49,50 @@ public class ClientAuthController {
     }
 
 
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<ClientResponseDto>> refresh(HttpServletRequest request){
+        String refresh_token =null;
+
+        for (Cookie cookie : request.getCookies()){
+            if ("refresh_token".equals(cookie.getName())){
+                refresh_token = cookie.getValue();
+                break;
+            }
+        }
+
+        if (refresh_token != null){
+            AuthResult authResult = refreshTokenService.generateNewAccessToken(refresh_token);
+
+            ApiResponse<ClientResponseDto> response = new ApiResponse<>(
+                    true,
+                    "Authenticated",
+                    authResult.getClientResponseDto(),
+                    null
+            );
+
+            ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
+                    .httpOnly(true)
+                    .secure(false) // change to true in production
+                    .path("/")
+                    .maxAge(1200000) // 15 minutes for access token
+                    .sameSite("Lax")
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                    .body(response);
+        }
+
+        ApiResponse<ClientResponseDto> response = new ApiResponse<>(
+                true,
+               null,
+                null,
+                "Login again"
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @PostMapping("/check-auth")
     public ResponseEntity<ApiResponse<Object>> checkAuth(HttpServletRequest request) {
         try {
@@ -79,24 +124,24 @@ public class ClientAuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<ClientResponseDto>> login(@Valid @RequestBody LoginRequestDto requestDto){
-        LoginResult loginResult = clientAuthService.login(requestDto);
+        AuthResult authResult = clientAuthService.login(requestDto);
 
         ApiResponse<ClientResponseDto> response = new ApiResponse<>(
                 true,
                 "Login Successful.",
-                loginResult.getClientResponseDto(),
+                authResult.getClientResponseDto(),
                 null
         );
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", loginResult.getAccessToken())
+        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
                 .httpOnly(true)
                 .secure(false) // change to true in production
                 .path("/")
-                .maxAge(15 * 60) // 15 minutes for access token
+                .maxAge(1200000) // 15 minutes for access token
                 .sameSite("Lax")
                 .build();
 
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", loginResult.getRefreshToken())
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", authResult.getRefreshToken())
                 .httpOnly(true)
                 .secure(false) // change to true in production
                 .path("/")
@@ -185,7 +230,7 @@ public class ClientAuthController {
                 .httpOnly(true)
                 .secure(true) // set to true in production
                 .path("/")
-                .maxAge(15 * 60) // 15 minutes
+                .maxAge(20) // 20 minutes
                 .sameSite("Lax")
                 .build();
 

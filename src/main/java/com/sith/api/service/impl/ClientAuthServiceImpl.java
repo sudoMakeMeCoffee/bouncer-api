@@ -3,7 +3,7 @@ package com.sith.api.service.impl;
 import com.sith.api.dto.request.LoginRequestDto;
 import com.sith.api.dto.request.SignUpRequestDto;
 import com.sith.api.dto.response.ClientResponseDto;
-import com.sith.api.dto.response.LoginResult;
+import com.sith.api.dto.response.AuthResult;
 import com.sith.api.dto.response.RefreshTokenResponseDto;
 import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientPrincipal;
@@ -71,7 +71,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
     }
 
     @Override
-    public LoginResult login(LoginRequestDto requestDto) {
+    public AuthResult login(LoginRequestDto requestDto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
         );
@@ -83,7 +83,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
         String accessToken = jwtUtil.generateToken(userDetails);
         RefreshTokenResponseDto refreshTokenResponseDto = refreshTokenService.createRefreshToken(client.getId());
 
-        return LoginResult.builder()
+        return AuthResult.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshTokenResponseDto.getToken())
                 .clientResponseDto(ClientResponseDto.fromEntity(client))

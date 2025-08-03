@@ -2,6 +2,7 @@ package com.sith.api.config;
 
 import com.sith.api.service.ClientDetailsService;
 import com.sith.api.utils.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -38,7 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         else {
             if (request.getCookies() != null){
                 for (Cookie cookie : request.getCookies()){
-                    if ("jwt".equals(cookie.getName())){
+                    if ("access_token".equals(cookie.getName())){
                         jwt = cookie.getValue();
                         break;
                     }
@@ -47,14 +48,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if(jwt != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            String email = jwtUtil.extractUsername(jwt);
-            UserDetails userDetails = clientDetailsService.loadUserByUsername(email);
 
-            if(jwtUtil.validateToken(jwt, userDetails)){
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            try{
+                String email = jwtUtil.extractUsername(jwt);
+                UserDetails userDetails = clientDetailsService.loadUserByUsername(email);
+                if(jwtUtil.validateToken(jwt, userDetails)){
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }catch (ExpiredJwtException ex){
+                filterChain.doFilter(request, response);
             }
+
+
+
         }
+
 
         filterChain.doFilter(request, response);
 
