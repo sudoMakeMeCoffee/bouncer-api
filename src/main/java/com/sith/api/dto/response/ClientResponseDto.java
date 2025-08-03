@@ -16,6 +16,7 @@ public class ClientResponseDto {
     private String email;
     private String username;
     private Role role;
+    private boolean emailVerified;
 
     public static ClientResponseDto fromEntity(Client client){
         return  ClientResponseDto.builder()
@@ -23,6 +24,7 @@ public class ClientResponseDto {
                 .email(client.getEmail())
                 .username(client.getUsername())
                 .role(client.getRole())
+                .emailVerified(client.isEmailVerified())
                 .build();
     }
 }

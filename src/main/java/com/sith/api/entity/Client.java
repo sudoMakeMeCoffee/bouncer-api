@@ -31,7 +31,7 @@ public class Client{
     private boolean emailVerified;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role;
 
     @UpdateTimestamp
     @Column(nullable = false, updatable = true)

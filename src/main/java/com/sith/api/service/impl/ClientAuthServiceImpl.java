@@ -8,6 +8,7 @@ import com.sith.api.dto.response.RefreshTokenResponseDto;
 import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientPrincipal;
 import com.sith.api.entity.VerificationToken;
+import com.sith.api.enums.Role;
 import com.sith.api.enums.VerificationType;
 import com.sith.api.exception.UnauthorizedException;
 import com.sith.api.repository.ClientRepository;
@@ -59,7 +60,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
                 .username(requestDto.getUsername())
                 .email(requestDto.getEmail())
                 .password(requestDto.getPassword()) // ⚠️ Make sure it's encrypted!
-                .role(requestDto.getRole())
+                .role(Role.CLIENT)
                 .build();
 
         Client savedClient = clientRepository.save(newClient);
