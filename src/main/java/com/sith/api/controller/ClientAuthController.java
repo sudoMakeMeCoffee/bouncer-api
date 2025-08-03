@@ -50,48 +50,61 @@ public class ClientAuthController {
 
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<ClientResponseDto>> refresh(HttpServletRequest request){
-        String refresh_token =null;
+    public ResponseEntity<ApiResponse<ClientResponseDto>> refresh(HttpServletRequest request) {
+        String refresh_token = null;
 
-        for (Cookie cookie : request.getCookies()){
-            if ("refresh_token".equals(cookie.getName())){
-                refresh_token = cookie.getValue();
-                break;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refresh_token".equals(cookie.getName())) {
+                    refresh_token = cookie.getValue();
+                    break;
+                }
             }
         }
 
-        if (refresh_token != null){
+        if (refresh_token == null) {
+            ApiResponse<ClientResponseDto> response = new ApiResponse<>(
+                    false,
+                    null,
+                    null,
+                    "Refresh token not found. Please log in again."
+            );
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        try {
             AuthResult authResult = refreshTokenService.generateNewAccessToken(refresh_token);
+
+            ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
+                    .httpOnly(true)
+                    .secure(false) // TODO: make conditional on env
+                    .path("/")
+                    .maxAge(15 * 60) // 15 mins in seconds
+                    .sameSite("Lax")
+                    .build();
 
             ApiResponse<ClientResponseDto> response = new ApiResponse<>(
                     true,
-                    "Authenticated",
+                    "Token refreshed successfully",
                     authResult.getClientResponseDto(),
                     null
             );
 
-            ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
-                    .httpOnly(true)
-                    .secure(false) // change to true in production
-                    .path("/")
-                    .maxAge(1200000) // 15 minutes for access token
-                    .sameSite("Lax")
-                    .build();
-
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                     .body(response);
+
+        } catch (Exception ex) {
+            ApiResponse<ClientResponseDto> response = new ApiResponse<>(
+                    false,
+                    null,
+                    null,
+                    "Refresh failed. Please login again."
+            );
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
-
-        ApiResponse<ClientResponseDto> response = new ApiResponse<>(
-                true,
-               null,
-                null,
-                "Login again"
-        );
-
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
+
 
     @PostMapping("/check-auth")
     public ResponseEntity<ApiResponse<Object>> checkAuth(HttpServletRequest request) {

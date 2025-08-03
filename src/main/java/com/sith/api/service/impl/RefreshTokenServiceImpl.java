@@ -49,22 +49,24 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public AuthResult generateNewAccessToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> new EntityNotFoundException("Invalid token"));
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new EntityNotFoundException("Invalid refresh token"));
 
-        if(refreshToken.getExpiredAt().isBefore(LocalDateTime.now())){
-            throw new UnauthorizedException("Expired token");
+        if (refreshToken.getExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new UnauthorizedException("Refresh token has expired");
         }
 
-        Client client = clientRepository.findById(refreshToken.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not Found"));
+        Client client = clientRepository.findById(refreshToken.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("Client not found"));
 
         UserDetails userDetails = clientDetailsService.loadUserByUsername(client.getEmail());
-
-        String access_token = jwtUtil.generateToken(userDetails);
+        String newAccessToken = jwtUtil.generateToken(userDetails);
 
         return AuthResult.builder()
-                .accessToken(access_token)
+                .accessToken(newAccessToken)
                 .clientResponseDto(ClientResponseDto.fromEntity(client))
                 .build();
-
     }
+
+
 }
