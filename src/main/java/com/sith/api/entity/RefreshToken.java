@@ -22,7 +22,7 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private UUID userId;
+    private UUID clientId;
 
     private String token;
 

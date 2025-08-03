@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 public class RefreshTokenResponseDto {
     private UUID id;
-    private UUID userId;
+    private UUID clientId;
     private String token;
     private String ipAddress;
     private LocalDateTime expiredAt;
@@ -22,7 +22,7 @@ public class RefreshTokenResponseDto {
     public static RefreshTokenResponseDto fromEntity(RefreshToken refreshToken){
         return RefreshTokenResponseDto.builder()
                 .id(refreshToken.getId())
-                .userId(refreshToken.getUserId())
+                .clientId(refreshToken.getClientId())
                 .token(refreshToken.getToken())
                 .expiredAt(refreshToken.getExpiredAt())
                 .build();

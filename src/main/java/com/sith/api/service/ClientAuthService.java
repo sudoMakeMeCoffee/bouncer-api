@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface ClientAuthService {
     public ClientResponseDto signUp(SignUpRequestDto requestDto);
     public AuthResult login(LoginRequestDto requestDto);
+    public void logout(HttpServletRequest request);
     public void sendVerificationLink(String to, String subject);
     public ClientResponseDto checkAuth(HttpServletRequest request);
 }

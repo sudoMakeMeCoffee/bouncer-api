@@ -105,7 +105,6 @@ public class ClientAuthController {
         }
     }
 
-
     @PostMapping("/check-auth")
     public ResponseEntity<ApiResponse<Object>> checkAuth(HttpServletRequest request) {
         try {
@@ -169,7 +168,10 @@ public class ClientAuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout() {
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+
+        clientAuthService.logout(request);
+
         ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", "")
                 .httpOnly(true)
                 .secure(false)

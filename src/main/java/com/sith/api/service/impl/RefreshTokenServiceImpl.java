@@ -12,10 +12,12 @@ import com.sith.api.service.ClientDetailsService;
 import com.sith.api.service.RefreshTokenService;
 import com.sith.api.utils.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,7 +39,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshTokenResponseDto createRefreshToken(UUID userId) {
 
         RefreshToken newRefreshToken = RefreshToken.builder()
-                .userId(userId)
+                .clientId(userId)
                 .token(UUID.randomUUID().toString())
                 .expiredAt(LocalDateTime.now().plusDays(7))
                 .build();
@@ -56,7 +58,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             throw new UnauthorizedException("Refresh token has expired");
         }
 
-        Client client = clientRepository.findById(refreshToken.getUserId())
+        Client client = clientRepository.findById(refreshToken.getClientId())
                 .orElseThrow(() -> new EntityNotFoundException("Client not found"));
 
         UserDetails userDetails = clientDetailsService.loadUserByUsername(client.getEmail());
@@ -67,6 +69,25 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .clientResponseDto(ClientResponseDto.fromEntity(client))
                 .build();
     }
+
+    @Override
+    public List<RefreshToken> findByClientId(UUID userId) {
+        return List.of();
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllByClientId(UUID clientId) {
+        refreshTokenRepository.deleteAllByClientId(clientId);
+        refreshTokenRepository.flush();
+    }
+
+    @Override
+    public RefreshToken findByToken(String token) {
+        return refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new EntityNotFoundException("Refresh token not found"));
+    }
+
 
 
 }

@@ -7,6 +7,7 @@ import com.sith.api.dto.response.AuthResult;
 import com.sith.api.dto.response.RefreshTokenResponseDto;
 import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientPrincipal;
+import com.sith.api.entity.RefreshToken;
 import com.sith.api.entity.VerificationToken;
 import com.sith.api.enums.Role;
 import com.sith.api.enums.VerificationType;
@@ -15,6 +16,7 @@ import com.sith.api.repository.ClientRepository;
 import com.sith.api.service.*;
 import com.sith.api.utils.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -81,6 +83,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("Client not found"));
 
         String accessToken = jwtUtil.generateToken(userDetails);
+        refreshTokenService.deleteAllByClientId(client.getId());
         RefreshTokenResponseDto refreshTokenResponseDto = refreshTokenService.createRefreshToken(client.getId());
 
         return AuthResult.builder()
@@ -88,6 +91,31 @@ public class ClientAuthServiceImpl implements ClientAuthService {
                 .refreshToken(refreshTokenResponseDto.getToken())
                 .clientResponseDto(ClientResponseDto.fromEntity(client))
                 .build();
+    }
+
+    @Override
+    public void logout(HttpServletRequest request){
+        String refreshToken = null;
+
+        // Get refresh token from cookies
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refresh_token".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken != null) {
+            try {
+                RefreshToken tokenEntity = refreshTokenService.findByToken(refreshToken);
+                refreshTokenService.deleteAllByClientId(tokenEntity.getClientId());
+            } catch (EntityNotFoundException e) {
+                return;
+            }
+        }
+
     }
 
     @Override
