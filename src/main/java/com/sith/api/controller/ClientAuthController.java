@@ -148,15 +148,15 @@ public class ClientAuthController {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
                 .httpOnly(true)
-                .secure(false) // change to true in production
+                .secure(false)
                 .path("/")
-                .maxAge(1200000) // 15 minutes for access token
+                .maxAge(20 * 60) // 15 minutes for access token
                 .sameSite("Lax")
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", authResult.getRefreshToken())
                 .httpOnly(true)
-                .secure(false) // change to true in production
+                .secure(false)
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60) // 7 days for refresh token
                 .sameSite("Lax")

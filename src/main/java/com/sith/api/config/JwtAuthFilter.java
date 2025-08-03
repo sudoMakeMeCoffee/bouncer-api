@@ -49,7 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                String email = jwtUtil.extractUsername(jwt); // may throw ExpiredJwtException
+                String email = jwtUtil.extractUsername(jwt);
                 UserDetails userDetails = clientDetailsService.loadUserByUsername(email);
 
                 if (jwtUtil.validateToken(jwt, userDetails)) {
@@ -59,8 +59,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException ex) {
-            // You might log this or attach it as a request attribute
-            // for refresh logic downstream (optional)
             request.setAttribute("expired", true);
         }
 
