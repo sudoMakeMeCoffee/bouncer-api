@@ -1,6 +1,7 @@
 package com.sith.api.service.impl;
 
 import com.sith.api.dto.request.CreateClientAppRequestDto;
+import com.sith.api.dto.response.ClientAppResponseDto;
 import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientApp;
 import com.sith.api.repository.ClientAppRepository;
@@ -8,6 +9,8 @@ import com.sith.api.service.AuthenticatedClientService;
 import com.sith.api.service.ClientAppService;
 import com.sith.api.utils.ApiKeyUtil;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ClientAppServiceImpl implements ClientAppService {
@@ -48,4 +51,14 @@ public class ClientAppServiceImpl implements ClientAppService {
 
         return apiKey;
     }
+
+    @Override
+    public List<ClientAppResponseDto> getAllAppsByClientId() {
+        Client currentClient = authenticatedClientService.getAuthenticatedClient();
+        List<ClientApp> apps = clientAppRepository.findAllByClientId(currentClient.getId());
+
+        return  apps.stream().map(ClientAppResponseDto::fromEntity).toList();
+    }
+
+
 }
