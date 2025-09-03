@@ -7,10 +7,10 @@ import com.sith.api.service.ClientAppUserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/client/app/user")
@@ -34,5 +34,19 @@ public class ClientAppUserController {
         );
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{appId}")
+    public ResponseEntity<ApiResponse<List<ClientAppUserResponseDto>>> getAllAppUsersByAppId(@PathVariable("appId") UUID appId){
+        List<ClientAppUserResponseDto> appUsers = clientAppUserService.getAllAppUsersByAppId(appId);
+
+        ApiResponse<List<ClientAppUserResponseDto>> response = new ApiResponse<>(
+                true,
+                "App users fetched successfully",
+                appUsers,
+                null
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

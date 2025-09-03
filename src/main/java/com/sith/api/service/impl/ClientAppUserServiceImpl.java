@@ -12,6 +12,9 @@ import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 public class ClientAppUserServiceImpl implements ClientAppUserService {
 
@@ -38,5 +41,12 @@ public class ClientAppUserServiceImpl implements ClientAppUserService {
 
         return ClientAppUserResponseDto.fromEntity(appUser);
 
+    }
+
+    @Override
+    public List<ClientAppUserResponseDto> getAllAppUsersByAppId(UUID appId) {
+        List<ClientAppUser> appUsers = clientAppUserRepository.findByClientAppId(appId);
+
+        return appUsers.stream().map(ClientAppUserResponseDto::fromEntity).toList();
     }
 }
