@@ -79,7 +79,7 @@ public class ClientAuthController {
                     .httpOnly(true)
                     .secure(false) // TODO: make conditional on env
                     .path("/")
-                    .maxAge(15 * 60) // 15 mins in seconds
+                    .maxAge(60) // 15 mins in seconds
                     .sameSite("Lax")
                     .build();
 
@@ -149,7 +149,7 @@ public class ClientAuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(20 * 60) // 15 minutes for access token
+                .maxAge(60)
                 .sameSite("Lax")
                 .build();
 

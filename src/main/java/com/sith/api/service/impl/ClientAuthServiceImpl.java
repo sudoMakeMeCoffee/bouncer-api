@@ -142,6 +142,11 @@ public class ClientAuthServiceImpl implements ClientAuthService {
     @Override
     public ClientResponseDto checkAuth(HttpServletRequest request) {
         String jwt = jwtUtil.extractJwtFromCookie(request);
+
+        if(jwt == null){
+            throw new UnauthorizedException("Can not find access token");
+        }
+
         String email = jwtUtil.extractEmail(jwt);
 
         Client client = clientRepository.findByEmail(email).orElseThrow(() -> new UnauthorizedException("User not found"));
