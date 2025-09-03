@@ -8,9 +8,11 @@ import com.sith.api.repository.ClientAppRepository;
 import com.sith.api.service.AuthenticatedClientService;
 import com.sith.api.service.ClientAppService;
 import com.sith.api.utils.ApiKeyUtil;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ClientAppServiceImpl implements ClientAppService {
@@ -58,6 +60,13 @@ public class ClientAppServiceImpl implements ClientAppService {
         List<ClientApp> apps = clientAppRepository.findAllByClientId(currentClient.getId());
 
         return  apps.stream().map(ClientAppResponseDto::fromEntity).toList();
+    }
+
+    @Override
+    public ClientAppResponseDto getAppById(UUID appId) {
+        ClientApp clientApp = clientAppRepository.findById(appId).orElseThrow(() -> new EntityNotFoundException("Client App not found."));
+
+        return ClientAppResponseDto.fromEntity(clientApp);
     }
 
 

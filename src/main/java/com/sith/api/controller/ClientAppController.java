@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/client/app")
@@ -43,6 +44,20 @@ public class ClientAppController {
                 true,
                 "Apps fetched successfully",
                 apps,
+                null
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{appId}")
+    public ResponseEntity<ApiResponse<ClientAppResponseDto>> getClientAppByAppId(@PathVariable("appId") UUID appId ){
+        ClientAppResponseDto app = clientAppService.getAppById(appId);
+
+        ApiResponse<ClientAppResponseDto> response = new ApiResponse<>(
+                true,
+                "App details fetched successfully",
+                app,
                 null
         );
 

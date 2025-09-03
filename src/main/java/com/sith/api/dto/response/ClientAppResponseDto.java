@@ -16,12 +16,14 @@ public class ClientAppResponseDto {
     private UUID id;
     private ClientResponseDto client;
     private String name;
+    private String apiKey;
 
     public static ClientAppResponseDto fromEntity(ClientApp clientApp){
         return ClientAppResponseDto.builder()
                 .id(clientApp.getId())
                 .client(ClientResponseDto.fromEntity(clientApp.getClient()))
                 .name(clientApp.getName())
+                .apiKey(clientApp.getApiKey())
                 .build();
     }
 }
