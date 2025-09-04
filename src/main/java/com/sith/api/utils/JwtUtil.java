@@ -39,6 +39,16 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 3600_000)) // 1 hour
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+
     public UUID extractUserId(String token) {
         Claims claims = extractClaims(token);
         return claims.get("userId", UUID.class); // or Long.class depending on how you stored it

@@ -1,13 +1,15 @@
 package com.sith.api.service.impl;
 
 import com.sith.api.dto.request.CreateClientAppUserRequestDto;
+import com.sith.api.dto.request.LoginAppUserRequestDto;
 import com.sith.api.dto.request.RegisterAppUserRequestDto;
-import com.sith.api.dto.response.ClientAppUserResponseDto;
+import com.sith.api.dto.response.*;
 import com.sith.api.entity.ClientApp;
 import com.sith.api.entity.ClientAppUser;
 import com.sith.api.repository.ClientAppRepository;
 import com.sith.api.repository.ClientAppUserRepository;
 import com.sith.api.service.ClientAppUserService;
+import com.sith.api.utils.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,11 +24,13 @@ public class ClientAppUserServiceImpl implements ClientAppUserService {
     private final ClientAppUserRepository clientAppUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final ClientAppRepository clientAppRepository;
+    private final JwtUtil jwtUtil;
 
-    public ClientAppUserServiceImpl(ClientAppUserRepository clientAppUserRepository, PasswordEncoder passwordEncoder, ClientAppRepository clientAppRepository) {
+    public ClientAppUserServiceImpl(ClientAppUserRepository clientAppUserRepository, PasswordEncoder passwordEncoder, ClientAppRepository clientAppRepository, JwtUtil jwtUtil) {
         this.clientAppUserRepository = clientAppUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.clientAppRepository = clientAppRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -65,4 +69,28 @@ public class ClientAppUserServiceImpl implements ClientAppUserService {
         return ClientAppUserResponseDto.fromEntity(appUser);
 
     }
+
+    @Override
+    public AppUserAuthResult login(LoginAppUserRequestDto requestDto, String apiKey) {
+
+        ClientApp clientApp = clientAppRepository.findByApiKey(apiKey)
+                .orElseThrow(() -> new EntityNotFoundException("Invalid API Key"));
+
+        ClientAppUser appUser = clientAppUserRepository
+                .findByEmailAndClientApp(requestDto.getEmail(), clientApp)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), appUser.getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        String accessToken = jwtUtil.generateToken(appUser.getEmail());
+
+        return AppUserAuthResult.builder()
+                .accessToken(accessToken)
+                .clientAppUserResponseDto(ClientAppUserResponseDto.fromEntity(appUser))
+                .build();
+    }
+
+
 }
