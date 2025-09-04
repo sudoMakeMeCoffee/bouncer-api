@@ -1,6 +1,7 @@
 package com.sith.api.service.impl;
 
 import com.sith.api.dto.request.CreateClientAppUserRequestDto;
+import com.sith.api.dto.request.RegisterAppUserRequestDto;
 import com.sith.api.dto.response.ClientAppUserResponseDto;
 import com.sith.api.entity.ClientApp;
 import com.sith.api.entity.ClientAppUser;
@@ -48,5 +49,20 @@ public class ClientAppUserServiceImpl implements ClientAppUserService {
         List<ClientAppUser> appUsers = clientAppUserRepository.findByClientAppId(appId);
 
         return appUsers.stream().map(ClientAppUserResponseDto::fromEntity).toList();
+    }
+
+    @Override
+    public ClientAppUserResponseDto register(RegisterAppUserRequestDto requestDto, String apiKey) {
+
+        ClientApp clientApp = clientAppRepository.findByApiKey(apiKey).orElseThrow(() -> new EntityNotFoundException("Invalid Api Key"));
+        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
+        ClientAppUser appUser = clientAppUserRepository.save(ClientAppUser.builder()
+                .clientApp(clientApp)
+                .email(requestDto.getEmail())
+                .password(encodedPassword)
+                .build());
+
+        return ClientAppUserResponseDto.fromEntity(appUser);
+
     }
 }

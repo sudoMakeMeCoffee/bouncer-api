@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface ClientAppRepository extends JpaRepository<ClientApp, UUID> {
     boolean existsByApiKey(String apiKey);
     List<ClientApp> findAllByClientId(UUID clientId);
+    Optional<ClientApp> findByApiKey(String apiKey);
 }
