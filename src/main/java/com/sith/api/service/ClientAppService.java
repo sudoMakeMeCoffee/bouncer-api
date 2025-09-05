@@ -10,7 +10,6 @@ public interface ClientAppService {
     public String createClientApp(CreateClientAppRequestDto requestDto);
 
     public List<ClientAppResponseDto> getAllAppsByClientId();
-
     public ClientAppResponseDto getAppById(UUID appId);
 }
 

@@ -9,6 +9,7 @@ import com.sith.api.service.AuthenticatedClientService;
 import com.sith.api.service.ClientAppService;
 import com.sith.api.utils.ApiKeyUtil;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,6 +62,8 @@ public class ClientAppServiceImpl implements ClientAppService {
 
         return  apps.stream().map(ClientAppResponseDto::fromEntity).toList();
     }
+
+
 
     @Override
     public ClientAppResponseDto getAppById(UUID appId) {
