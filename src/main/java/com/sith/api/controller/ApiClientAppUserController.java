@@ -6,6 +6,7 @@ import com.sith.api.dto.request.RegisterAppUserRequestDto;
 import com.sith.api.dto.response.*;
 import com.sith.api.entity.ClientApp;
 import com.sith.api.service.ClientAppUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -57,7 +58,7 @@ public class ApiClientAppUserController {
                 null
         );
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
+        ResponseCookie accessTokenCookie = ResponseCookie.from("_access_token", authResult.getAccessToken())
                 .httpOnly(true)
                 .secure(false)   // set true in production
                 .path("/")
@@ -67,6 +68,30 @@ public class ApiClientAppUserController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .body(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("_access_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+
+        ApiResponse<Void> response = new ApiResponse<>(
+                true,
+                "Logged out successfully",
+                null,
+                null
+        );
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, String.valueOf(accessTokenCookie))
                 .body(response);
     }
 
