@@ -15,7 +15,8 @@ import java.util.UUID;
 @Builder
 public class ClientAppUserResponseDto {
     private UUID id;
-    private ClientAppResponseDto clientApp;
+    private UUID appId;
+    private String appName;
     private String email;
     private boolean emailVerified;
     private LocalDateTime updatedAt;
@@ -24,7 +25,8 @@ public class ClientAppUserResponseDto {
     public static ClientAppUserResponseDto fromEntity(ClientAppUser appUser) {
         return ClientAppUserResponseDto.builder()
                 .id(appUser.getId())
-                .clientApp(ClientAppResponseDto.fromEntity(appUser.getClientApp()))
+                .appId(appUser.getClientApp().getId())
+                .appName(appUser.getClientApp().getName())
                 .email(appUser.getEmail())
                 .emailVerified(appUser.isEmailVerified())
                 .updatedAt(appUser.getUpdatedAt())

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -17,6 +18,7 @@ public class ClientAppResponseDto {
     private ClientResponseDto client;
     private String name;
     private String apiKey;
+    private List<ClientAppUserResponseDto> users;
 
     public static ClientAppResponseDto fromEntity(ClientApp clientApp){
         return ClientAppResponseDto.builder()
@@ -24,6 +26,7 @@ public class ClientAppResponseDto {
                 .client(ClientResponseDto.fromEntity(clientApp.getClient()))
                 .name(clientApp.getName())
                 .apiKey(clientApp.getApiKey())
+                .users(clientApp.getUsers().stream().map(ClientAppUserResponseDto::fromEntity).toList())
                 .build();
     }
 }
