@@ -3,6 +3,7 @@ package com.sith.api.controller;
 import com.sith.api.dto.request.CreateClientAppRequestDto;
 import com.sith.api.dto.response.ApiResponse;
 import com.sith.api.dto.response.ClientAppResponseDto;
+import com.sith.api.dto.response.CreateClientAppResponseDto;
 import com.sith.api.service.ClientAppService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,13 +24,13 @@ public class ClientAppController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> createClientApp(@Valid @RequestBody CreateClientAppRequestDto requestDto){
-        String apiKey = clientAppService.createClientApp(requestDto);
+    public ResponseEntity<ApiResponse<CreateClientAppResponseDto>> createClientApp(@Valid @RequestBody CreateClientAppRequestDto requestDto){
+        CreateClientAppResponseDto clientApp = clientAppService.createClientApp(requestDto);
 
-        ApiResponse<String> response = new ApiResponse<>(
+        ApiResponse<CreateClientAppResponseDto> response = new ApiResponse<>(
                 true,
                 "App created successfully.",
-                apiKey,
+                clientApp,
                 null
         );
 

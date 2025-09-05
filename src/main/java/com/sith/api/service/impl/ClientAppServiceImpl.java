@@ -2,6 +2,7 @@ package com.sith.api.service.impl;
 
 import com.sith.api.dto.request.CreateClientAppRequestDto;
 import com.sith.api.dto.response.ClientAppResponseDto;
+import com.sith.api.dto.response.CreateClientAppResponseDto;
 import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientApp;
 import com.sith.api.repository.ClientAppRepository;
@@ -9,7 +10,6 @@ import com.sith.api.service.AuthenticatedClientService;
 import com.sith.api.service.ClientAppService;
 import com.sith.api.utils.ApiKeyUtil;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class ClientAppServiceImpl implements ClientAppService {
     }
 
     @Override
-    public String createClientApp(CreateClientAppRequestDto requestDto) {
+    public CreateClientAppResponseDto createClientApp(CreateClientAppRequestDto requestDto) {
 
         Client currentClient = authenticatedClientService.getAuthenticatedClient();
 
@@ -52,7 +52,7 @@ public class ClientAppServiceImpl implements ClientAppService {
 
         createdApp.setApiKey(apiKey);
 
-        return apiKey;
+        return CreateClientAppResponseDto.fromEntity(createdApp);
     }
 
     @Override

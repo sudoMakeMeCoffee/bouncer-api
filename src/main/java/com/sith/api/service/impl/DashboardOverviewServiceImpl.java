@@ -6,13 +6,14 @@ import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientApp;
 import com.sith.api.repository.ClientAppRepository;
 import com.sith.api.service.AuthenticatedClientService;
+import com.sith.api.service.ClientAppUserService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class DashboardOverviewServiceImpl implements DashboardOverviewService{
+public class DashboardOverviewServiceImpl implements ClientAppUserService.DashboardOverviewService {
 
     private final ClientAppRepository clientAppRepository;
     private final AuthenticatedClientService authenticatedClientService;

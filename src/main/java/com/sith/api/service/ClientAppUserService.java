@@ -5,6 +5,7 @@ import com.sith.api.dto.request.LoginAppUserRequestDto;
 import com.sith.api.dto.request.RegisterAppUserRequestDto;
 import com.sith.api.dto.response.AppUserAuthResult;
 import com.sith.api.dto.response.ClientAppUserResponseDto;
+import com.sith.api.dto.response.DashboardOverviewResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -17,4 +18,7 @@ public interface ClientAppUserService {
     public AppUserAuthResult login(LoginAppUserRequestDto requestDto, String apiKey);
     public ClientAppUserResponseDto authenticated(HttpServletRequest request);
 
+    interface DashboardOverviewService {
+        public DashboardOverviewResponseDto getDashboardOverviewData();
+    }
 }
