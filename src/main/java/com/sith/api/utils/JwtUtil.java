@@ -29,6 +29,12 @@ public class JwtUtil {
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
+    public boolean validateToken(String token, String email) {
+        String username = extractUsername(token);
+        return username.equals(email) && !isTokenExpired(token);
+    }
+
+
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
@@ -59,6 +65,17 @@ public class JwtUtil {
 
         for (Cookie cookie : request.getCookies()) {
             if ("access_token".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    public String extractAppUserTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+
+        for (Cookie cookie : request.getCookies()) {
+            if ("_access_token".equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }

@@ -4,14 +4,17 @@ import com.sith.api.dto.request.CreateClientAppUserRequestDto;
 import com.sith.api.dto.request.LoginAppUserRequestDto;
 import com.sith.api.dto.request.RegisterAppUserRequestDto;
 import com.sith.api.dto.response.*;
+import com.sith.api.entity.Client;
 import com.sith.api.entity.ClientApp;
 import com.sith.api.entity.ClientAppUser;
+import com.sith.api.entity.ClientPrincipal;
+import com.sith.api.exception.UnauthorizedException;
 import com.sith.api.repository.ClientAppRepository;
 import com.sith.api.repository.ClientAppUserRepository;
 import com.sith.api.service.ClientAppUserService;
 import com.sith.api.utils.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -90,6 +93,25 @@ public class ClientAppUserServiceImpl implements ClientAppUserService {
                 .accessToken(accessToken)
                 .clientAppUserResponseDto(ClientAppUserResponseDto.fromEntity(appUser))
                 .build();
+    }
+
+    @Override
+    public ClientAppUserResponseDto authenticated(HttpServletRequest request) {
+        String jwt = jwtUtil.extractAppUserTokenFromCookie(request);
+
+        if(jwt == null){
+            throw new UnauthorizedException("Can not find access token");
+        }
+
+        String email = jwtUtil.extractEmail(jwt);
+
+        ClientAppUser appUser = clientAppUserRepository.findByEmail(email).orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        if (jwt == null || !jwtUtil.validateToken(jwt, appUser.getEmail())){
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        return ClientAppUserResponseDto.fromEntity(appUser);
     }
 
 

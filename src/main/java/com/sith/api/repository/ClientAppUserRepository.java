@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface ClientAppUserRepository extends JpaRepository<ClientAppUser, UUID> {
     List<ClientAppUser> findByClientAppId(UUID clientAppId);
     Optional<ClientAppUser> findByEmailAndClientApp(String email, ClientApp clientApp);
+    Optional<ClientAppUser> findByEmail(String email);
 }

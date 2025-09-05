@@ -5,6 +5,7 @@ import com.sith.api.dto.request.LoginRequestDto;
 import com.sith.api.dto.request.RegisterAppUserRequestDto;
 import com.sith.api.dto.response.*;
 import com.sith.api.entity.ClientApp;
+import com.sith.api.exception.UnauthorizedException;
 import com.sith.api.service.ClientAppUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -93,6 +94,19 @@ public class ApiClientAppUserController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, String.valueOf(accessTokenCookie))
                 .body(response);
+    }
+
+    @PostMapping("/authenticated")
+    public ResponseEntity<ApiResponse<Object>> authenticated(HttpServletRequest request) {
+        try {
+            ClientAppUserResponseDto user = clientAppUserService.authenticated(request);
+
+            return ResponseEntity.ok(
+                    new ApiResponse<>(true, "Authorized", user, null));
+        } catch (UnauthorizedException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>(false, "Unauthorized", null, ex.getMessage()));
+        }
     }
 
 
