@@ -80,7 +80,7 @@ public class ClientAuthController {
                     .secure(true)
                     .path("/")
                     .maxAge(60 * 60 * 24)
-                    .sameSite("Lax")
+                    .sameSite("None")
                     .build();
 
             ApiResponse<ClientResponseDto> response = new ApiResponse<>(
@@ -150,7 +150,7 @@ public class ClientAuthController {
                 .secure(true)
                 .path("/")
                 .maxAge(60 * 60 * 24)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", authResult.getRefreshToken())
@@ -158,7 +158,7 @@ public class ClientAuthController {
                 .secure(true)
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60) // 7 days for refresh token
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
 
         return ResponseEntity.ok()
@@ -177,14 +177,14 @@ public class ClientAuthController {
                 .secure(true)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
 
         ApiResponse<Void> response = new ApiResponse<>(
@@ -246,7 +246,7 @@ public class ClientAuthController {
                 .secure(true)
                 .path("/")
                 .maxAge(60 * 60 * 24)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
@@ -254,7 +254,7 @@ public class ClientAuthController {
                 .secure(true)
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60) // 7 days
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
 
         return ResponseEntity.status(HttpStatus.FOUND)
