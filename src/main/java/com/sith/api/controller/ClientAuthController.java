@@ -77,7 +77,7 @@ public class ClientAuthController {
 
             ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(true)
                     .path("/")
                     .maxAge(60 * 60 * 24)
                     .sameSite("Lax")
@@ -147,7 +147,7 @@ public class ClientAuthController {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(60 * 60 * 24)
                 .sameSite("Lax")
@@ -155,7 +155,7 @@ public class ClientAuthController {
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", authResult.getRefreshToken())
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60) // 7 days for refresh token
                 .sameSite("Lax")
@@ -174,14 +174,14 @@ public class ClientAuthController {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(0)
                 .sameSite("Lax")
                 .build();
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(0)
                 .sameSite("Lax")
@@ -243,9 +243,9 @@ public class ClientAuthController {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", accessToken)
                 .httpOnly(true)
-                .secure(true) // set to true in production
+                .secure(true)
                 .path("/")
-                .maxAge(20) // 20 minutes
+                .maxAge(60 * 60 * 24)
                 .sameSite("Lax")
                 .build();
 
