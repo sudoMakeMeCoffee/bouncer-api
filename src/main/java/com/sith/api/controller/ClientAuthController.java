@@ -77,9 +77,9 @@ public class ClientAuthController {
 
             ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", authResult.getAccessToken())
                     .httpOnly(true)
-                    .secure(false) // TODO: make conditional on env
+                    .secure(false)
                     .path("/")
-                    .maxAge(60) // 15 mins in seconds
+                    .maxAge(60 * 60 * 24)
                     .sameSite("Lax")
                     .build();
 
@@ -149,7 +149,7 @@ public class ClientAuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(60)
+                .maxAge(60 * 60 * 24)
                 .sameSite("Lax")
                 .build();
 
