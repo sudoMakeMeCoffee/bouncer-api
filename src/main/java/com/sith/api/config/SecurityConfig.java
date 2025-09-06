@@ -47,26 +47,23 @@ public class SecurityConfig  {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        return new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                CorsConfiguration configuration = new CorsConfiguration();
-                String origin = request.getHeader("Origin");
+        return request -> {
+            CorsConfiguration configuration = new CorsConfiguration();
 
-                // 🔹 Dynamically allow the request origin
-                if (origin != null) {
-                    configuration.addAllowedOrigin(origin);
-                }
-
-                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "x-api-key"));
-                configuration.setAllowCredentials(true);
-                configuration.setExposedHeaders(Arrays.asList("Authorization"));
-
-                return configuration;
+            String origin = request.getHeader("Origin");
+            if (origin != null) {
+                // use addAllowedOriginPattern instead of addAllowedOrigin
+                configuration.addAllowedOriginPattern(origin);
             }
+
+            configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+            configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "x-api-key"));
+            configuration.setAllowCredentials(true);
+
+            return configuration;
         };
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
