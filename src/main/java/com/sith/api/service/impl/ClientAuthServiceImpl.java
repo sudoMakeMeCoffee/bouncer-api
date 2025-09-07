@@ -67,7 +67,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
 
         Client savedClient = clientRepository.save(newClient);
 
-        sendVerificationLink(savedClient.getEmail(), "Verify your email");
+        //sendVerificationLink(savedClient.getEmail(), "Verify your email");
 
         return ClientResponseDto.fromEntity(savedClient);
     }

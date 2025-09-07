@@ -200,6 +200,7 @@ public class ClientAuthController {
                 .body(response);
     }
 
+//    TODO
     @GetMapping("/verification")
     public ResponseEntity<Void> verification(@RequestParam("token") String token, @RequestParam("type") String type ){
         Optional<VerificationToken> optionalVerificationToken = verificationTokenService.findByToken(token);
