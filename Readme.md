@@ -128,5 +128,5 @@ Or navigate to [Bouncer API Documentation](https://bouncer-api-production.up.rai
 ## ⚡ Links
 
 - [Live Documentation](https://bouncer-api-production.up.railway.app/)
-- [Console Repository](https://github.com/sudoMakeMeCoffee/bouncer-api)
+- [Bouncer Console Repository](https://github.com/sudoMakeMeCoffee/bouncer-console)
 
