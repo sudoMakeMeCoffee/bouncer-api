@@ -3,7 +3,7 @@
 Bouncer API is a modern **Authentication-as-a-Service (AaaS)** solution that allows developers to easily integrate user authentication (registration, login, logout, and session validation) into their applications. Built with **Spring Boot** and designed for simplicity, security, and scalability.
 
 This is the backend API for
-[Bouncer Console](https://github.com/sudoMakeMeCoffee/bouncer-api)
+🔗[Bouncer Console](https://github.com/sudoMakeMeCoffee/bouncer-console)
 
 
 ## 🚀 Features
