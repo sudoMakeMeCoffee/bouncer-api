@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncer API Documentation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/themes/prism-tomorrow.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reset & base */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f9fafb; color: #333; line-height: 1.6; }
+        a { text-decoration: none; }
+        main { display: flex; max-width: 1200px; margin: 2rem auto; gap: 2rem; padding: 0 1rem; }
+
+        /* Header */
+        header { background: #4f46e5; color: white; padding: 2rem 1rem; text-align: center; border-bottom: 4px solid #4338ca; }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { color: #c7d2fe; font-size: 1rem; }
+
+        /* Top buttons */
+        .top-links { display: flex; justify-content: center; gap: 1rem; margin: 1.5rem 0; }
+        .top-links a { padding: 0.6rem 1.2rem; background: #4f46e5; color: white; font-weight: bold; border-radius: 6px; transition: 0.3s; }
+        .top-links a:hover { background: #4338ca; }
+
+        /* Sidebar navigation */
+        nav { flex: 0 0 220px; background: #eef2ff; padding: 1.5rem; border-radius: 8px; position: sticky; top: 2rem; height: fit-content; }
+        nav a { display: block; margin-bottom: 0.8rem; color: #4f46e5; font-weight: bold; padding: 0.5rem; border-radius: 4px; transition: 0.3s; }
+        nav a:hover { background: #ddd6fe; }
+
+        /* Documentation content */
+        .content { flex: 1; }
+        section { background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
+        section h2 { color: #1e40af; margin-bottom: 1rem; font-size: 1.8rem; }
+        p.description { margin-bottom: 1rem; font-size: 1rem; }
+        p.method-path { font-weight: bold; margin-bottom: 1rem; color: #2563eb; background: #eef2ff; padding: 0.4rem 0.8rem; border-radius: 4px; display: inline-block; }
+
+        /* Code blocks */
+        pre { border-radius: 8px; overflow-x: auto; font-size: 0.95rem; line-height: 1.5; padding: 1rem; background: #1e1e2f; color: #f8f8f2; }
+        code { font-family: 'Fira Code', monospace; }
+
+        /* Footer */
+        footer { text-align: center; padding: 2rem 1rem; background: #e0e7ff; color: #4f46e5; margin-top: 2rem; border-top: 2px solid #4338ca; }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            main { flex-direction: column; }
+            nav { position: relative; top: auto; margin-bottom: 2rem; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Bouncer API Documentation</h1>
+    <p>Authentication-as-a-Service (AaaS) for your apps</p>
+</header>
+
+<div class="top-links">
+    <a href="https://bouncer-psi.vercel.app" target="_blank">Start using Bouncer</a>
+    <a href="https://github.com/sudoMakeMeCoffee/bouncer-api" target="_blank">
+         GitHub Repo</a>
+</div>
+
+<main>
+    <!-- Sidebar navigation -->
+
+
+    <div class="content">
+        <!-- Register Section -->
+        <section id="register">
+            <h2>Registration</h2>
+            <p class="description">Register a new user under your application. Include your <code>x-api-key</code> in headers.</p>
+            <p class="method-path">POST /api/v1/users/register</p>
+            <p><strong>Example Request:</strong></p>
+            <pre><code class="language-js">fetch("https://bouncer-api-production.up.railway.app/api/v1/users/register", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": "YOUR_API_KEY"
+  },
+  body: JSON.stringify({ email: "test@example.com", password: "12345678" })
+});</code></pre>
+            <p><strong>Sample Response:</strong></p>
+            <pre><code class="language-json">{
+  "success": true,
+  "message": "User registered successfully.",
+  "data": {
+    "id": "64f1a2b5e9f1e",
+    "email": "test@example.com"
+  },
+  "errors": null
+}</code></pre>
+        </section>
+
+        <!-- Login Section -->
+        <section id="login">
+            <h2>Login</h2>
+            <p class="description">Authenticate a user with email and password. Returns JWT access token in HTTP-only cookie.</p>
+            <p class="method-path">POST /api/v1/users/login</p>
+            <p><strong>Example Request:</strong></p>
+            <pre><code class="language-js">fetch("https://bouncer-api-production.up.railway.app/api/v1/users/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": "YOUR_API_KEY"
+  },
+  body: JSON.stringify({ email: "test@example.com", password: "12345678" }),
+  credentials: "include"
+});</code></pre>
+            <p><strong>Sample Response:</strong></p>
+            <pre><code class="language-json">{
+  "success": true,
+  "message": "Login successful."
+}</code></pre>
+        </section>
+
+        <!-- Logout Section -->
+        <section id="logout">
+            <h2>Logout</h2>
+            <p class="description">Clears authentication cookies, logging the user out.</p>
+            <p class="method-path">POST /api/v1/users/logout</p>
+            <p><strong>Example Request:</strong></p>
+            <pre><code class="language-js">fetch("https://bouncer-api-production.up.railway.app/api/v1/users/logout", {
+  method: "POST",
+  headers: { "x-api-key": "YOUR_API_KEY" },
+  credentials: "include"
+});</code></pre>
+            <p><strong>Sample Response:</strong></p>
+            <pre><code class="language-json">{
+  "success": true,
+  "message": "Logged out successfully",
+  "data": null
+}</code></pre>
+        </section>
+
+        <!-- Check Auth Section -->
+        <section id="auth">
+            <h2>Check Authentication</h2>
+            <p class="description">Verify if the current user is authenticated using access token in the cookie.</p>
+            <p class="method-path">POST /api/v1/users/authenticated</p>
+            <p><strong>Example Request:</strong></p>
+            <pre><code class="language-js">fetch("https://bouncer-api-production.up.railway.app/api/v1/users/authenticated", {
+  method: "POST",
+  headers: { "x-api-key": "YOUR_API_KEY" },
+  credentials: "include"
+});</code></pre>
+            <p><strong>Sample Response:</strong></p>
+            <pre><code class="language-json">{
+  "success": true,
+  "message": "Authorized",
+  "data": {
+    "id": "64f1a2b5e9f1e",
+    "email": "test@example.com"
+  },
+  "errors": null
+}</code></pre>
+        </section>
+    </div>
+</main>
+
+<footer>
+    &copy; 2025 Bouncer API. Built with Spring Boot & HTML/CSS
+</footer>
+
+<!-- Prism.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/components/prism-javascript.min.js"></script>
+
+</body>
+</html>
