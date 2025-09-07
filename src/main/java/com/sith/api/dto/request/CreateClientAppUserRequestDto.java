@@ -18,6 +18,6 @@ public class CreateClientAppUserRequestDto {
     @Email(message = "Enter a valid email.")
     private String email;
 
-    @Min(value = 8, message = "Password must have minimum 8 characters.")
+    @NotBlank(message = "Password is required.")
     private String password;
 }
